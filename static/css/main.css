@@ -1,0 +1,421 @@
+ul.nav .icon-white {
+  opacity: 0.5;
+}
+ul.nav li.active .icon-white, 
+ul.nav li a:hover .icon-white,
+ul.nav li a:focus .icon-white,
+ul.nav li.open .icon-white {
+  opacity: 1;
+}
+.navbar-right {
+  /*position: absolute;*/
+  /*top: 60px; 
+  height: auto; 
+  padding: 20px;
+  padding-top: 0px;
+  padding-left: 0px;*/
+  margin-left: 30px !important;
+}
+.main {
+  position: relative; 
+  padding-right: 30px; 
+  border-right: #DDDDDD 1px solid;
+  max-width: 800px;
+}
+.heading-top-left {
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  padding: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border: #DDDDDD 1px solid;
+  border-bottom-right-radius: 10px;
+  -moz-border-bottom-right-radius: 10px;
+  -webkit-border-bottom-right-radius: 10px;
+  border-top-left-radius: 10px;
+  -moz-border-top-left-radius: 10px;
+  -webkit-border-top-left-radius: 10px;
+  background-color: #FFEEEE;
+  font-weight: 600;
+}
+.feed {
+  /*border: #DDDDDD 1px solid;*/
+  margin-top: -21px;
+  padding-top: 5px;
+  /*border-top-right-radius: 10px;
+  -moz-border-top-right-radius: 10px;
+  -webkit-border-top-right-radius: 10px;*/
+  border-bottom-right-radius: 10px;
+  -moz-border-bottom-right-radius: 10px;
+  -webkit-border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  -moz-border-bottom-left-radius: 10px;
+  -webkit-border-bottom-left-radius: 10px;
+}
+.btn-group .filter {
+  font-weight: 600;
+}
+.btn-filter {
+  position: absolute;
+  right: 60px;
+  top: 6px;
+}
+.btn-filter .btn-mini {
+  padding-top: 1px;
+  padding-left: 7px;
+}
+.btn-mini .caret {
+  margin-top: 8px;
+}
+.btn-new {
+  font-weight: 600;
+  position: absolute;
+  right: 30px;
+  top: 6px;
+}
+.btn-new i{
+  /*font-size: 14px;*/
+}
+.post {
+  background-color: #E2E2E2;
+  padding: 10px;
+  padding-top: 15px;
+  border-radius: 7px;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px;
+  position: relative;
+  box-shadow: inset 0 0px 4px silver;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.post .bottom {
+  /*margin-top: 10px;*/
+}
+.post.reply {
+  background-color: #FFFFFF;
+  padding-top: 10px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  font-size: 12px;
+  border: 1px solid #FFFFFF;
+  box-shadow: 0 1px 6px silver;
+}
+.post.reply .username {
+  font-size: 13px;
+}
+.post .username {
+  font-weight: bold;
+  font-size: 14px;
+  margin-left: 3px;
+}
+.post .datetime {
+  /*position: absolute;
+  top: 7px;
+  right: 10px;*/
+  color: #999999;
+  font-size: 12px;
+}
+.post .datetime .date {
+  font-weight: 600;
+  margin-right: 3px;
+  font-size: 12px;
+}
+.post .datetime i {
+  font-size: 14px;
+}
+.post .text {
+  margin-left: 3px;
+}
+.post .bottom .tags {
+  margin-bottom: 5px;
+}
+.post .bottom .tags .btn {
+  color: #999999;
+}
+.post td {
+  text-align: center;
+}
+.post .vote td {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 10px;
+  text-align: center;
+  width: 100px;
+}
+.post .vote {
+  padding-top: 0px;
+  margin-top: 0px;
+  margin-left: -2px;
+  color: #999999;
+}
+.post .vote .caret-up, .post .vote .caret-down {
+  cursor: pointer; 
+  width: 20px; 
+  text-align: center; 
+  font-size: 12px;
+  height: 20px !important;
+  padding-bottom: 0px;
+  padding-top: 0px;
+  box-sizing: border-box;
+}
+.post .vote .number {
+  line-height: 8px; 
+  width: 20px !important;
+  text-align: center !important;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.post .vote .number i {
+  cursor: pointer;
+}
+.post .vote .icon-chevron-down {
+  line-height: 12px;
+}
+.post .vote .caret-up:hover, .post .vote .caret-down:hover {
+ /* font-size: 25px;*/
+}
+.post .vote:hover .number {
+  /*line-height: 5px;*/
+}
+.post .vote:hover .caret-up, .post .vote:hover .caret-down {
+  /*font-size: 25px;*/
+  /*padding-top: 1px;
+  padding-bottom: 1px;*/
+}
+.post .row-fluid .span1 {
+  width: 0.801104972375691%;
+  *width: 0.747913483013988%;
+}
+.post .row-fluid .span11 {
+  width: 96.43646408839778%;
+  *width: 96.38327259903608%;
+}
+.post .username {
+  margin-right: 3px;
+  margin-left: 3px;
+}
+.post .reply .username {
+  margin-left: 3px;
+}
+.post .reply .info {
+  /*position: absolute;
+  right: 5px;
+  bottom: -10px;*/
+}
+.post .reply .info .label {
+  font-weight: 600;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-bottom: 4px;
+  border-radius: 7px;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px;
+}
+.post .reply .info .label i {
+  margin-top: 3px;
+}
+.post .more-replies {
+  cursor: pointer;
+  min-height: 3px !important;
+}
+.post .more-replies hr {
+  height: 1px;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+.post .btn-editsave {
+  display: none;
+}
+.post .tools i {
+  margin-right: 1px;
+  margin-left: 1px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.post .goodposttext {
+  color: #999999;
+  font-size: 10px;
+  position: relative;
+  margin-left: 43px;
+  text-align: left;
+}
+.post .goodposttext .icon-certificate {
+  font-size: 22px;
+  color: #333333;
+  margin-right: 2px;
+  position: relative;
+  bottom: -3px;
+}
+.post .goodposttext .icon-ok, .post .goodposttext .icon-question-sign {
+  font-size: 11px;
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  z-index: 2;
+  color: #333333;
+}
+.post .goodposttext .icon-ok {
+  color: #FFFFFF;
+}
+.post .goodposttext .icon-circle {
+  color: #FFFFFF;
+  position: absolute;
+  left: 4px;
+  top: 5px;
+  z-index: 1;
+  font-size: 14px;
+}
+.post .goodposttext .icon-question-sign {
+  /*background-color: #FFFFFF;*/
+  font-size: 16px;
+  left: 3px;
+  top: 4px;
+}
+.btn-tag {
+  background-image: none;
+}
+h5 i {
+
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  background-image: url('../img/avatar/avatar-set.png');
+  background-repeat: no-repeat;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border: #FFFFFF 1px solid;
+  cursor: pointer;
+  margin-top: 1px;
+}
+.a {
+  background-position: -327px -162px;
+}
+.b {
+  background-position: -177px -162px;
+}
+.c {
+  background-position: -477px -162px;
+}
+.d {
+  background-position: -402px -162px;
+}
+.accordion_comments {
+  font-size: 8px !important;
+  line-height: 1px;
+  display: inline-block;
+  margin-left: 3px;
+  margin-top: 8px;
+  cursor: pointer;
+  float: left;
+  /*-webkit-transform: rotate(90deg); 
+  -moz-transform: rotate(90deg);*/
+}
+.accordion_comments i {
+  margin-top: -6px;
+}
+.commentstxt {
+  display: inline-block;
+  margin-top: 6px;
+  color: #999999;
+  font-size: 12px;
+  margin-left: 3px;
+}
+.commentstxt i {
+  font-size: 12px;
+  cursor: pointer;
+}
+.commentstxt .nocomment:previous {
+  display: none;
+}
+.post-user-details {
+  border: #CDCDCD 1px dashed;
+  border-left: 0;
+  border-right: 0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  position: relative;
+  font-size: 12px;
+  padding-left: 1px;
+}
+.post-user-details .title {
+  font-weight: 600;
+  width: 80px;
+  float: left;
+}
+.post-user-details .colleague-button {
+  position: absolute;
+  bottom: 5px;
+  right: 0;
+}
+.post-user-details .colleague-button i{
+  margin-top: 4px;
+}
+.post-user-details .icon-remove-sign {
+  position: absolute;
+  right: 0;
+  top: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.newpost, .newreply {
+  position: relative;
+}
+.newpost .btn-send, .newreply .btn-send {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+.newpost textarea, .newreply textarea {
+  font-size: 1em;
+  background-color: #F7F7F7;
+  overflow: hidden; 
+  resize: none; 
+  height: 60px;
+  /*padding-right: 50px;*/
+  transition: height 0.2s;
+  -webkit-transition: height 0.2s; 
+  -moz-transition: height 0.2s;
+  /*word-wrap: break-word;*/
+}
+.newpost .tagsinput {
+  background-color: #F7F7F7;
+  min-width: 100px;
+  /*border: #CCCCCC 1px solid;*/
+}
+.newpost .icon-remove-sign {
+  position: absolute;
+  right: -6px;
+  top: -8px;
+  cursor: pointer;
+  font-size: 19px;
+  color: #999999;
+  background-color: #FFFFFF;
+}
+.newpost .info {
+  position: absolute;
+  bottom: 3px;
+  right: 60px;
+  font-size: 16px;
+  z-index: 10;
+}
+.newreply .icon-remove-sign {
+  position: absolute;
+  right: -6px;
+  top: 2px;
+  cursor: pointer;
+  font-size: 19px;
+  color: #999999;
+  background: #FFFFFF;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+  -webkit-border-radius: 15px;
+}
+.taglink  a, .taglink label{
+  color: #FFFFFF !important;
+}
