@@ -1,25 +1,27 @@
 from posts.models import Post
 from posts.models import Tag
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
 from django.template import Context, loader
 from django.core import serializers
+from django.core.serializers import serialize
+from django.shortcuts import render
 from django.http import HttpResponse
 
 def index(request):
-	template = loader.get_template('index.html')
-	context = Context({
-		'taglist': Tag.objects.all()
-	})
-	return HttpResponse(template.render(context))
+	return render(request, 'index.html', 
+		{
+			'taglist': Tag.objects.all(),
+			'taglist_json': serialize('json', Tag.objects.all())
+		}
+	)
 
 def feed(request):
-	template = loader.get_template('feed.html')
-	context = Context({'url':'test'})
-	return HttpResponse(template.render(context))
+	return render(request, 'feed.html')
 	
-def detail(request, post_id):
-	return HttpResponse("You're looking at post %s." % post_id)
+def rightbar(request):
+	return render(request, 'rightbar.html')
 	
-def GetPosts(request, **kwargs):
-	items = Post.objects.all()
-	items = serializers.serialize('json', items, indent=4)
-	return HttpResponse(items, mimetype='application/json')
+def header(request):
+	return render(request, 'header.html')

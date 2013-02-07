@@ -15,3 +15,7 @@ class PostTag(models.Model):
 	post = models.ForeignKey('Post')
 	tag = models.ForeignKey('Tag')
 	
+class PostVote(models.Model):
+	post = models.ForeignKey('Post')
+	username = models.ForeignKey('users.User')
+	

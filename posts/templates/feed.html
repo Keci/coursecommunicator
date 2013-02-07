@@ -1,10 +1,10 @@
 <input ng-model="filter" value="[[filter]]" type="hidden" />
 
-<div class="post" ng-repeat="post in feed | filter:filter" ng-mouseenter="showTools=true" ng-mouseleave="showTools=false">
+<div class="post" ng-repeat="post in feed | filter:filter | orderBy: order:true" ng-mouseenter="showTools=true" ng-mouseleave="showTools=false">
 <div class="row-fluid content">
 				<div class="span1">
 				  <div class="vote">
-					<div class="number"><i class="icon-chevron-up"></i><br />[[post.votes]]<br /><i class="icon-chevron-down"></i></div>
+					<div class="number"><i class="icon-chevron-up" ng-click="vote('up',post.id)"></i><br />[[post.votes]]<br /><i class="icon-chevron-down" ng-click="vote('down',post.id)"></i></div>
 				  </div>
 				</div>
 				<div class="span11">	
@@ -21,7 +21,7 @@
 						<i class="icon-star"></i>
 						<i class="icon-reply" ng-click="showNewReply=!showNewReply" init="showNewReply=false"></i>
 					  </div>
-					  <span class="username">[[post.user.name]]</span> <span class="datetime">(<span class="time"><abbr class="timeago" title="[[post.pubdate]]" reldate>[[post.pubdate]]</abbr></span>)</span><div class="text">[[post.text]]</div>
+					  <span class="username">[[post.user.name]]</span> <span class="datetime">(<span class="time"><abbr class="timeago" title="[[post.pubdate]]" reldate="post">[[post.pubdate]]</abbr></span>)</span><div class="text" ng-bind-html="post.text | textfilter"></div>
 					</div>
 					
 				  </div>
@@ -50,7 +50,7 @@
 					  </div>
 					  <div class="tags pull-right">
 			            <div class="btn-group" style="margin-bottom: 5px;">
-				          <button class="btn btn-mini btn-tag" ng-repeat="tag in post.tags" onClick="location.href='/#/filter/[[tag.tag.name]]/'">#[[tag.tag.name]]</button>
+				          <button class="btn btn-mini btn-tag" ng-repeat="tag in post.tags" onClick="location.href='/#/[[ordertmp]]/filter/[[tag.tag.name]]/'">#[[tag.tag.name]]</button>
 						</div>
 					  </div>
 					</div>
@@ -60,11 +60,15 @@
 				<div class="row-fluid newreply" ng-show="showNewReply">
 				  <div class="span1"></div>
 				  <div class="span11">
-			        <i class="icon-remove-sign" ng-click="showNewReply=false"></i>
-			        <reply-post><textarea class="span12 newreplytxt"></textarea><br /><br /></reply-post>
+			        <!--<i class="icon-remove-sign" ng-click="showNewReply=false"></i>//-->
+					<form name="newReply" id="newReply" ng-submit="submit('newReply',[[post.id]])">
+					  <div class="textareadiv reply" contenteditable name="text" ng-model="newpost.replytext" required></div>
+			          <textarea class="span12 newreplytxt" ng-minlength="10" name="text" ng-model="newpost.replytext" required></textarea>
+				      <a class="info" title="At least 10 characters text." ui-jq="tooltip" ng-show="newReply.$invalid"><i class="icon-exclamation-sign" style="text-decoration: none;"></i></a>
+			          <button class="btn btn-inverse btn-mini btn-send" type="submit" ng-disabled="newReply.$invalid"><i class="icon-ok"></i>&nbsp;&nbsp;Send</button>
+			        </form>
 				  </div>
-				  <button class="btn btn-inverse btn-mini btn-send" type="button"><i class="icon-ok"></i>&nbsp;&nbsp;Send</button>
-			    </div>
+				</div>
 				
 				<div class="replies" ng-show="showReplies" ng-init="showReplies=true">
 				<div class="row-fluid reply" ng-repeat="reply in post.replies" ng-mouseenter="showToolsReply=true" ng-mouseleave="showToolsReply=false">
@@ -73,7 +77,7 @@
 					<div>
 						<div class="span1">
 							<div class="vote" style="margin-right: 5px; margin-top: 17px;">
-							  <div class="number"><i class="icon-chevron-up"></i><br />[[reply.votes]]<br /><i class="icon-chevron-down"></i></div>
+							  <div class="number"><i class="icon-chevron-up" ng-click="vote('up',reply.id)"></i><br />[[reply.votes]]<br /><i class="icon-chevron-down" ng-click="vote('down',post.id)"></i></div>
 							</div>
 						</div>
 						<div class="span11 post reply">
@@ -86,9 +90,9 @@
 							  </div>
 							  <div class="span11" style="width: 94%; margin-left: 0px; margin-top: -2px;">
 								<div class="reply-tools pull-right">
-								  <span style="cursor: pointer; font-size: 14px;" ng-show="showToolsReply"><i class="icon-pencil"></i></span>
+								  <span style="cursor: pointer; font-size: 14px;" ng-show="showToolsReply"><i class="icon-pencil" ng-click="editPost!=editPost"></i></span>
 								</div>
-								<span class="username">[[reply.user.name]]</span> <span class="datetime">(<span class="time"><abbr class="timeago" title="[[reply.pubdate]]" reldate>[[reply.pubdate]]</abbr></span>)</span><div class="text">[[reply.text]]</div>
+								<span class="username">[[reply.user.name]]</span> <span class="datetime">(<span class="time"><abbr class="timeago" title="[[reply.pubdate]]" reldate="reply">[[reply.pubdate]]</abbr></span>)</span><div class="text" ng-init="editPost=false" editpost ng-bind-html="reply.text | textfilter"></div>
 							  </div>
 							</div>
 							<ng-switch on="reply.goodpost">

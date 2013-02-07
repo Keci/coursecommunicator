@@ -1,9 +1,12 @@
 import datetime
-from tastypie.authorization import Authorization
+from tastypie.authorization import *
+from tastypie.authentication import BasicAuthentication
+from tastypie import resources
 from tastypie.resources import ModelResource
 from tastypie.serializers import Serializer
 from tastypie import fields
-from posts.models import Post, Tag, PostTag
+from tastypie.constants import ALL, ALL_WITH_RELATIONS
+from posts.models import Post, Tag, PostTag, PostVote
 from users.models import User, Avatar
 
 def format_datetime(self):
@@ -46,26 +49,50 @@ class TagResource(ModelResource):
 	class Meta:
 		queryset = Tag.objects.all()
 		resource_name = 'tag'
+
+class PostResource(ModelResource):
+	username_id = fields.ForeignKey(UserResource, 'username')
+	parentpost_id = fields.ForeignKey('self', 'parentpost', null=True)
+
+	class Meta:
+		queryset = Post.objects.all()
+		resource_name = 'post'
+		authentication = BasicAuthentication()
+		authorization = Authorization()
+		always_return_data = True
 		
 class PostTagResource(ModelResource):
 	tag = fields.ForeignKey(TagResource, 'tag', full=True)
+	post = fields.ForeignKey(PostResource, 'post')
 
 	class Meta:
 		queryset = PostTag.objects.all()
 		resource_name = 'posttag'
+		authentication = BasicAuthentication()
+		authorization = Authorization()
 		
-class GetPostsResource(ModelResource):
+class FeedResource(ModelResource):
 	user = fields.ForeignKey(UserResource, 'username', full=True)
 	replies = fields.ToManyField('self', attribute=lambda bundle: Post.objects.filter(parentpost=bundle.obj), null=True, full=True)
 	tags = fields.ToManyField(PostTagResource, attribute=lambda bundle: PostTag.objects.filter(post_id=bundle.obj), null=True, full=True)
 	
 	class Meta:
-		queryset = Post.objects.filter(parentpost__isnull=True)
-		detail_allowed_methods = ['post', 'put', 'delete']
-		resource_name = 'posts'
-		#authorization = Authorization()
+		queryset = Post.objects.filter(parentpost__isnull=True).order_by('-pubdate')
+		resource_name = 'feed'
+		authentication = BasicAuthentication()
+		authorization = ReadOnlyAuthorization()
 		excludes = ['parentpost']
+		
+class PostVoteResource(ModelResource):
+	post_id = fields.ForeignKey(PostResource, 'post')
+	username_id = fields.ForeignKey(UserResource, 'username')
 	
-	#def dehydrate(self, bundle):
-	#	bundle.data['date'] = format_datetime(bundle.data['pubdate'])
-	#	return bundle
+	class Meta:
+		queryset = PostVote.objects.all()
+		resource_name = 'postvote'
+		authentication = BasicAuthentication()
+		authorization = Authorization()
+		filtering = {
+			'post_id': ('exact'),
+			'username_id': ('exact')
+		}
