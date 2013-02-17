@@ -279,10 +279,10 @@ h5 i {
 
 }
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 32px !important;
+  height: 32px !important;
   overflow: hidden;
-  background-image: url('../img/avatar/avatar-set.png');
+  /*background-image: url('../img/avatar/avatar-set.png');*/
   background-repeat: no-repeat;
   border-radius: 3px;
   -moz-border-radius: 3px;
@@ -434,6 +434,7 @@ h5 i {
   padding: 4px 6px;
   vertical-align: middle;
   white-space: pre-wrap;
+  outline: 0px !important;
 }
 .textareadiv.reply {
   margin-top: 5px;

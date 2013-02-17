@@ -38,6 +38,23 @@ var CourseCommunicator = angular.module("CourseCommunicator", ['ui.directives', 
 	}
 );
 
+CourseCommunicator.factory("Constants", function(DjangoConstants) {
+  // pull in the django constants
+  var constants = {};
+  angular.extend(constants, DjangoConstants);
+ 
+  return {
+    get: function(key) {
+      return constants[key];
+    },
+    // this is a handy way to make all constants available in your HTML 
+    // e.g. $scope.c = Constants.all() 
+    all: function() {
+      return constants;
+    }
+  };
+});
+
 CourseCommunicator.filter('textfilter', function(){
 	return function(text) {
 		return text.replace(/\n/g, '<br/>');
@@ -64,7 +81,8 @@ CourseCommunicator.factory('feed', ['$resource', function($resource) {
 }]);
 
 // Feed Controller
-var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams) {
+var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams, Constants) {
+	$scope.c = Constants.all();
 	$scope.orderlink = $(".nav-tabs li.active").attr("id");
 
 	// Feed Resource
@@ -113,7 +131,7 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams) {
 	
 	// Get Feed by default (and update every 120s)
 	function poll() {
-		feedResource.get({url: 'feed/', format: 'json'}, function(data) {
+		feedResource.get({url: 'feed/', format: 'json', course: $scope.c.course_id}, function(data) {
 			$scope.feed = data.objects;
 		});
 		$timeout(poll, 120000);
@@ -132,7 +150,8 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams) {
 		}
 		var data = ({
 			"parentpost_id": parentpost,
-			"username_id": "/api/posts/user/1/",
+			//"username_id": "/api/posts/user/1/",
+			"course": "/api/posts/course/" + $scope.c.course_id + "/",
 			"pubdate": new Date(),
 			"text": text,
 			"votes": 0,
@@ -179,7 +198,7 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams) {
 				}
 			}
 			
-			postvoteResource.get({url: '/', format: 'json', 'post_id': postid, 'username_id': 1}, function(data) {
+			postvoteResource.get({url: '/', format: 'json', 'post_id': postid, 'username_id': $scope.c.user_id}, function(data) {
 				if(data.meta.total_count > 0) {
 					console.info("You already have voted for this post.");
 				} else {
@@ -188,7 +207,7 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams) {
 					}, function(data) {
 						postvoteResource.save({url: '/'}, {
 							"post_id": "/api/posts/post/" + postid + "/",
-							"username_id": "/api/posts/user/1/"
+							//"username_id": "/api/posts/user/1/"
 						}, function(data) {
 							$timeout(function()
 							{
@@ -210,10 +229,14 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams) {
 }
 
 // Filter Controller
-var FilterCtrl = function($scope, $rootScope, $route, $routeParams) {
+var FilterCtrl = function($scope, $rootScope, $route, $routeParams, Constants) {
 	$scope.filter = $routeParams.filter;
+	if(typeof $scope.filter === 'undefined'){
+		$(".currentfilter").html("all");
+	} else {
+		$(".currentfilter").html($scope.filter);
+	}
 	$scope.ordertmp = $routeParams.order;
-	$(".currentfilter").html($scope.filter);
 
 	if($routeParams.order == "") {
 		$scope.order = "pubdate";
@@ -221,13 +244,15 @@ var FilterCtrl = function($scope, $rootScope, $route, $routeParams) {
 		$scope.order = "votes";
 	}
 	
+	$scope.c = Constants.all();
+	
 	$(".nav-tabs li").removeClass();
 	$(".nav-tabs li#" + $routeParams.order).addClass("active");
 	
 	$(".filterlink").each(function() {
 		var currentlink = $(this).children("a").attr("href");
 		var part = currentlink.split("/filter/");
-		var newlink = "/#/" + $routeParams.order + "/filter/" + part[1];
+		var newlink = "/" + $scope.c.course_short_title + "/feed" + "/#/" + $routeParams.order + "/filter/" + part[1];
 		$(this).children("a").attr("href", newlink);
 	});
 }

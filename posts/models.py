@@ -2,7 +2,8 @@ from django.db import models
 
 class Post(models.Model):
 	parentpost = models.ForeignKey('self', blank=True, null=True)
-	username = models.ForeignKey('users.User')
+	username = models.ForeignKey('customuser.CustomUser')
+	course = models.ForeignKey('course.Course', null=True)
 	pubdate = models.DateTimeField('Date')
 	text = models.TextField()
 	votes = models.IntegerField()
@@ -17,5 +18,5 @@ class PostTag(models.Model):
 	
 class PostVote(models.Model):
 	post = models.ForeignKey('Post')
-	username = models.ForeignKey('users.User')
+	username = models.ForeignKey('customuser.CustomUser')
 	

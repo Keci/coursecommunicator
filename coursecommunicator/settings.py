@@ -104,9 +104,8 @@ ROOT_URLCONF = 'coursecommunicator.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'coursecommunicator.wsgi.application'
 
-TEMPLATE_DIRS = (
-    "C:/django-dev/coursecommunicator/templates"
-)
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+TEMPLATE_DIRS = ( os.path.join(SITE_ROOT, 'templates'),)
 
 INSTALLED_APPS = (
     'django.contrib.auth',

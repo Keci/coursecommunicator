@@ -7,7 +7,10 @@ from tastypie.serializers import Serializer
 from tastypie import fields
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from posts.models import Post, Tag, PostTag, PostVote
-from users.models import User, Avatar
+from django.contrib.auth.models import User
+from customuser.models import CustomUser
+from course.models import Course
+import urllib, hashlib
 
 def format_datetime(self):
 	data = self.replace(tzinfo=None)
@@ -32,67 +35,97 @@ def format_datetime(self):
 	else:
 		return '{}h ago'.format(s/3600)
 
-class AvatarResource(ModelResource):
-	class Meta:
-		queryset = Avatar.objects.all();
-		resource_name = 'avatar'
-		excludes = ['id']
+#class AvatarResource(ModelResource):
+#	class Meta:
+#		queryset = Avatar.objects.all();
+#		resource_name = 'avatar'
+#		excludes = ['id']
+
+class CommAuthentication(BasicAuthentication):
+    def __init__(self, *args, **kwargs):
+        super(CommAuthentication, self).__init__(*args, **kwargs)
+
+    def is_authenticated(self, request, **kwargs):
+        return request.user.is_authenticated()
 
 class UserResource(ModelResource):
-	avatar = fields.ForeignKey(AvatarResource, 'avatar', null=True, full=True)
-
 	class Meta:
-		queryset = User.objects.all()
-		resource_name = 'user'
+		queryset = CustomUser.objects.all()
+		resource_name = 'user',
+		excludes = ['last_login', 'password', 'date_joined', 'first_name', 'last_name', 'is_superuser', 'is_active', 'username']
 
+	def dehydrate(self, bundle):
+		bundle.data['gravatar_url'] = "http://www.gravatar.com/avatar/" + hashlib.md5(bundle.data['email'].lower()).hexdigest() + "?"
+		bundle.data['gravatar_url'] += urllib.urlencode({'d':'identicon', 's':str(32)})
+		return bundle
+		
 class TagResource(ModelResource):
 	class Meta:
 		queryset = Tag.objects.all()
 		resource_name = 'tag'
+		
+class CourseResource(ModelResource):
+	class Meta:
+		queryset = Course.objects.all()
+		resource_name = 'course'
 
 class PostResource(ModelResource):
-	username_id = fields.ForeignKey(UserResource, 'username')
+	username_id = fields.ForeignKey(UserResource, 'username', full=True)
 	parentpost_id = fields.ForeignKey('self', 'parentpost', null=True)
+	course = fields.ForeignKey(CourseResource, 'course', null=True)
 
 	class Meta:
 		queryset = Post.objects.all()
 		resource_name = 'post'
-		authentication = BasicAuthentication()
+		authentication = CommAuthentication()
 		authorization = Authorization()
 		always_return_data = True
 		
+	def obj_create(self, bundle, request, **kwargs):
+		return super(PostResource, self).obj_create(bundle, request, username=CustomUser.objects.get(user_ptr_id=request.user))
+		
 class PostTagResource(ModelResource):
-	tag = fields.ForeignKey(TagResource, 'tag', full=True)
 	post = fields.ForeignKey(PostResource, 'post')
+	tag = fields.ForeignKey(TagResource, 'tag', full=True)
 
 	class Meta:
 		queryset = PostTag.objects.all()
 		resource_name = 'posttag'
-		authentication = BasicAuthentication()
+		authentication = CommAuthentication()
 		authorization = Authorization()
 		
 class FeedResource(ModelResource):
 	user = fields.ForeignKey(UserResource, 'username', full=True)
 	replies = fields.ToManyField('self', attribute=lambda bundle: Post.objects.filter(parentpost=bundle.obj), null=True, full=True)
 	tags = fields.ToManyField(PostTagResource, attribute=lambda bundle: PostTag.objects.filter(post_id=bundle.obj), null=True, full=True)
+	course = fields.ForeignKey(CourseResource, 'course', full=True)
 	
 	class Meta:
 		queryset = Post.objects.filter(parentpost__isnull=True).order_by('-pubdate')
 		resource_name = 'feed'
-		authentication = BasicAuthentication()
+		authentication = CommAuthentication()
 		authorization = ReadOnlyAuthorization()
 		excludes = ['parentpost']
+		filtering = {
+			'course': ('exact')
+		}
+		
+	#def get_object_list(self, request):
+	#	return super(FeedResource, self).get_object_list(request).filter(course_id=Course.objects.get(short_title=course_short_title))
 		
 class PostVoteResource(ModelResource):
 	post_id = fields.ForeignKey(PostResource, 'post')
-	username_id = fields.ForeignKey(UserResource, 'username')
+	username_id = fields.ForeignKey(UserResource, 'username', full=True)
 	
 	class Meta:
 		queryset = PostVote.objects.all()
 		resource_name = 'postvote'
-		authentication = BasicAuthentication()
+		authentication = CommAuthentication()
 		authorization = Authorization()
 		filtering = {
 			'post_id': ('exact'),
 			'username_id': ('exact')
 		}
+		
+	def obj_create(self, bundle, request, **kwargs):
+		return super(PostVoteResource, self).obj_create(bundle, request, username=CustomUser.objects.get(user_ptr_id=request.user))

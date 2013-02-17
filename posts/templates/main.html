@@ -1,47 +1,51 @@
-<!DOCTYPE html>
-<html ng-app="CourseCommunicator">
-  <head>
-    <title>CourseCommunicator</title>
-	<meta charset="utf-8">
-	<script src="{{ STATIC_URL }}js/jquery-1.8.3.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+{% extends "base.html" %}
+
+{% block additional_headers %}
 	<script src="{{ STATIC_URL }}js/angular.min.js"></script>
 	<script src="{{ STATIC_URL }}js/angular-resource.min.js"></script>
 	<script src="{{ STATIC_URL }}js/angular-sanitize.min.js"></script>
 	<script src="{{ STATIC_URL }}js/angular-ui.js"></script>
-	<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+	<!--<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>//-->
 	<script src="{{ STATIC_URL }}js/bootstrap-multiselect.js"></script>
 	<script src="{{ STATIC_URL }}js/jquery.timeago.js"></script>
 	<script src="{{ STATIC_URL }}js/controllers.js"></script>
+	<script type="text/javascript">
+	angular.module('CourseCommunicator').constant("DjangoConstants", {
+		course_short_title: '{{ course_short_title }}',
+		course_id: '{{ course_id }}',
+		user_id: '{{ request.user.id }}'
+	});
+	</script>
 	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic" rel="stylesheet" type="text/css">
     <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" rel="stylesheet">
 	<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet" media="screen">
 	<link href="{{ STATIC_URL }}css/font-awesome.css" rel="stylesheet" media="screen">
 	<link href="{{ STATIC_URL }}css/angular-ui.css" rel="stylesheet" media="screen">
-	<link href="{{ STATIC_URL }}css/main.css" rel="stylesheet" media="screen">
-  </head>
-  <body ng-controller="FeedCtrl">
-    {% include "header.html" %}
-	
-	<div class="container-fluid" style="margin-top: 60px;">
+	<link href="{{ STATIC_URL }}css/posts.css" rel="stylesheet" media="screen">
+{% endblock %}
+
+{% block content %}
+
+	<div ng-app="CourseCommunicator">
+	<div class="container-fluid" style="margin-top: 20px;" ng-controller="FeedCtrl">
         <div class="row-fluid">
 		  
 		  <div class="span7 main">
 		  
 		    <ul class="nav nav-tabs">
-			  <li class="active" id="new"><a href="/#/new">new</a></li>
-			  <li id="hot"><a href="/#/hot">hot</a></li>
-			  <li id="saved"><a href="/#/saved">saved</a></li>
-			  <li id="bugs"><a href="/#/bugs">bugs & support</a></li>
+			  <li class="active" id="new"><a href="/{{course_short_title}}/feed/#/new">new</a></li>
+			  <li id="hot"><a href="/{{course_short_title}}/feed/#/hot">hot</a></li>
+			  <li id="saved"><a href="/{{course_short_title}}/feed/#/personal">personal</a></li>
+			  <li id="bugs"><a href="/{{course_short_title}}/feed/#/bugs">bugs & support</a></li>
 			</ul>
 
 		    <div class="btn-group btn-filter">
 			  <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">Filter:&nbsp;&nbsp;<span class="currentfilter">all</span></b>&nbsp;&nbsp;<span class="caret"></span></a>
 			  <ul class="dropdown-menu">
-			    <li><a href="/#/new">all</a></li>
+			    <li><a href="/{{course_short_title}}/feed/#/new">all</a></li>
 				{% for tag in taglist %} 
-				  <li class="filterlink"><a href="/#/[[orderlink]]/filter/{{tag.name}}/">{{tag.name}}</a></li>
-				{% endfor %}
+				  <li class="filterlink"><a href="/{{course_short_title}}/feed/#/[[orderlink]]/filter/{{tag.name}}/">{{tag.name}}</a></li>
+				{% endfor %} 
 			  </ul>
 		    </div>
 
@@ -78,6 +82,6 @@
 		  </div>
 
 		</div>
-	</div>	
-  </body>
-</html>
+	</div>
+    </div>	
+{% endblock %}

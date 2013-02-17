@@ -12,16 +12,18 @@
 				  <div class="row-fluid" style="margin-top: 4px;">
 					
 					<div class="span1" style="width: 3%;">
-					  <div class="avatar [[post.user.avatar.cssclass]]" ng-click="showPostUserDetails=!showPostUserDetails" init="showPostUserDetails=false"></div>
+					  <div class="avatar" style="background-image: url('[[post.user.gravatar_url]]');" ng-click="showPostUserDetails=!showPostUserDetails" init="showPostUserDetails=false"></div>
 					</div>
 					
 					<div class="span11" style="width: 94%; margin-top: -2px;">
 					  <div class="tools pull-right" ng-show="showTools">
-						<i class="icon-pencil"></i>
+						<ng-switch on="post.user.id">
+						  <i ng-switch-when="{{request.user.id}}" class="icon-pencil"></i>
+						</ng-switch>
 						<i class="icon-star"></i>
 						<i class="icon-reply" ng-click="showNewReply=!showNewReply" init="showNewReply=false"></i>
 					  </div>
-					  <span class="username">[[post.user.name]]</span> <span class="datetime">(<span class="time"><abbr class="timeago" title="[[post.pubdate]]" reldate="post">[[post.pubdate]]</abbr></span>)</span><div class="text" ng-bind-html="post.text | textfilter"></div>
+					  <span class="username">[[post.user.nickname]]</span> <span class="datetime">(<span class="time"><abbr class="timeago" title="[[post.pubdate]]" reldate="post">[[post.pubdate]]</abbr></span>)</span><div class="text" ng-bind-html="post.text | textfilter"></div>
 					</div>
 					
 				  </div>
@@ -30,7 +32,7 @@
 					  <div class="span12 post-user-details">
 					    <button class="btn btn-mini btn-inverse colleague-button" type="button"><i class="icon-group"></i> become a colleague</button>
 						<i class="icon-remove-sign" ng-click="showPostUserDetails=false"></i>
-					    <div class="title">Nickname</div>[[post.user.name]]<br />
+					    <div class="title">Nickname</div>[[post.user.nickname]]<br />
 						<div class="title">Statement</div>[[post.user.statement]]<br />
 						<div class="title">Contact</div>[[post.user.email]]<br />
 					  </div>
@@ -50,7 +52,7 @@
 					  </div>
 					  <div class="tags pull-right">
 			            <div class="btn-group" style="margin-bottom: 5px;">
-				          <button class="btn btn-mini btn-tag" ng-repeat="tag in post.tags" onClick="location.href='/#/[[ordertmp]]/filter/[[tag.tag.name]]/'">#[[tag.tag.name]]</button>
+				          <button class="btn btn-mini btn-tag" ng-repeat="tag in post.tags" onClick="location.href='/{{course_short_title}}/feed/#/[[ordertmp]]/filter/[[tag.tag.name]]/'">#[[tag.tag.name]]</button>
 						</div>
 					  </div>
 					</div>
@@ -86,13 +88,17 @@
 							</ng-switch>//-->
 							<div class="row-fluid">
 							  <div class="span1" style="width: 6%;">
-								<div class="avatar [[reply.user.avatar.cssclass]]" ng-click="showReplyUserDetails=!showReplyUserDetails" ng-init="showReplyUserDetails=false"></div>
+								<div class="avatar" style="background-image: url('[[reply.user.gravatar_url]]');" ng-click="showReplyUserDetails=!showReplyUserDetails" ng-init="showReplyUserDetails=false"></div>
 							  </div>
 							  <div class="span11" style="width: 94%; margin-left: 0px; margin-top: -2px;">
 								<div class="reply-tools pull-right">
-								  <span style="cursor: pointer; font-size: 14px;" ng-show="showToolsReply"><i class="icon-pencil" ng-click="editPost!=editPost"></i></span>
+								  <span style="cursor: pointer; font-size: 14px;" ng-show="showToolsReply">
+								  <ng-switch on="reply.user.id">
+									<i ng-switch-when="{{request.user.id}}" class="icon-pencil" ng-click="editPost!=editPost"></i>
+								  </ng-switch>
+								  </span>
 								</div>
-								<span class="username">[[reply.user.name]]</span> <span class="datetime">(<span class="time"><abbr class="timeago" title="[[reply.pubdate]]" reldate="reply">[[reply.pubdate]]</abbr></span>)</span><div class="text" ng-init="editPost=false" editpost ng-bind-html="reply.text | textfilter"></div>
+								<span class="username">[[reply.user.nickname]]</span> <span class="datetime">(<span class="time"><abbr class="timeago" title="[[reply.pubdate]]" reldate="reply">[[reply.pubdate]]</abbr></span>)</span><div class="text" ng-init="editPost=false" editpost ng-bind-html="reply.text | textfilter"></div>
 							  </div>
 							</div>
 							<ng-switch on="reply.goodpost">
@@ -104,7 +110,7 @@
 							  <div class="span12 post-user-details" style="border-bottom: 0; margin-bottom: 0px;">
 								<button class="btn btn-mini btn-inverse colleague-button" type="button"><i class="icon-group"></i> become a colleague</button>
 								<i class="icon-remove-sign" ng-click="showReplyUserDetails=false"></i>
-								<div class="title">Nickname</div>[[reply.user.name]]<br />
+								<div class="title">Nickname</div>[[reply.user.nickname]]<br />
 								<div class="title">Statement</div>[[reply.user.statement]]<br />
 								<div class="title">Contact</div>[[reply.user.email]]<br />
 							  </div>

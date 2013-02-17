@@ -25,7 +25,7 @@
       return inWords($.timeago.datetime(timestamp));
     }
   };
-  var $t = $.timeago;
+  var $t = $.timeago; 
 
   $.extend($.timeago, {
     settings: {
