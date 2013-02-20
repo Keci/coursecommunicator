@@ -454,3 +454,24 @@ h5 i {
   margin-top: 5px;
   background: #EDEDED;
 }
+.spinner {
+	position: absolute;
+	background: rgba(0, 0, 0, 1);
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+	filter: alpha(opacity=80);
+	-moz-opacity:0.8;
+	-khtml-opacity: 0.8;
+	opacity: 0.8;
+	background-image: url('../img/ajax-loading-spinner.gif');
+	background-position: center center;
+	background-repeat: no-repeat;
+	z-index: 1000;
+	border-radius: 10px;
+	width:70px;
+    height:70px;
+    position:fixed;
+    top:50%;
+    left:50%;
+    margin-top:-35px; /* negative half the size of height */
+    margin-left:-35px; /* negative half the size of width */
+}

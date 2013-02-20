@@ -11,7 +11,7 @@
 	<script src="{{ STATIC_URL }}js/controllers.js"></script>
 	<script type="text/javascript">
 	angular.module('CourseCommunicator').constant("DjangoConstants", {
-		course_short_title: '{{ course_short_title }}',
+		course_short_title: '{{ request.session.course_short_title }}',
 		course_id: '{{ course_id }}',
 		user_id: '{{ request.user.id }}'
 	});
@@ -25,9 +25,9 @@
 {% endblock %}
 
 {% block content %}
-
 	<div ng-app="CourseCommunicator">
 	<div class="container-fluid" style="margin-top: 20px;" ng-controller="FeedCtrl">
+		<div ng-show="loading" class="spinner"></div>
         <div class="row-fluid">
 		  
 		  <div class="span7 main">
@@ -50,7 +50,7 @@
 		    </div>
 
 		    <div class="btn-group btn-new" ng-click="showNewPost=!showNewPost">
-			  <a class="btn btn-mini btn-inverse" href="#"><i class="icon-reply" ng-init="showNewPost=false"></i></a>
+			  <button class="btn btn-mini btn-inverse"><i class="icon-reply" ng-init="showNewPost=false"></i></button>
 		    </div>
 			
 		    <div class="newpost" ng-show="showNewPost">
@@ -73,12 +73,13 @@
 			    <button class="btn btn-inverse btn-mini btn-send" type="submit" ng-disabled="newPost.$invalid"><i class="icon-ok"></i>&nbsp;&nbsp;Send</button>
 			  </form>
 		    </div>
+			
 		    <div class="feed" ng-view></div>
 
 		  </div>
 		 
 		  <div class="span5 navbar-right">
-		  {% include "rightbar.html" %}
+		  {% include "posts/rightbar.html" %}
 		  </div>
 
 		</div>

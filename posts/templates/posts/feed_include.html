@@ -1,5 +1,21 @@
-<input ng-model="filter" value="[[filter]]" type="hidden" />
+<div ng-show="loading" class="spinner"></div>
 
+<input ng-model="filter" value="[[filter]]" type="hidden" />
+  <div class="btn-group pull-right" style="position: relative; bottom: 30px;" ng-click="showNewPost=!showNewPost">
+			    <button class="btn btn-mini btn-inverse"><i class="icon-reply" ng-init="showNewPost=false"></i></button>
+		      </div>
+			
+		    <div class="newpost" ng-show="showNewPost">
+			  <!--<i class="icon-remove-sign" ng-click="showNewPost=false"></i>//-->
+			  <form name="newPost" id="newPost" ng-submit="submit('newPost',0)">
+				<div class="textareadiv" contenteditable name="text" id="text" ng-model="newpost.text" required></div>
+			    <textarea class="span12 newposttxt" ng-minlength="10" name="text" ng-model="newpost.text" required></textarea><br />
+				<a class="info" title="At least 10 characters text." ui-jq="tooltip" ng-show="newPost.$invalid"><i class="icon-exclamation-sign" style="text-decoration: none;"></i></a>
+			    <button class="btn btn-inverse btn-mini btn-send" type="submit" ng-disabled="newPost.$invalid"><i class="icon-ok"></i>&nbsp;&nbsp;Send</button>
+			  </form>
+		    </div>
+			
+			
 <div class="post" ng-repeat="post in feed | filter:filter | orderBy: order:true" ng-mouseenter="showTools=true" ng-mouseleave="showTools=false">
 <div class="row-fluid content">
 				<div class="span1">

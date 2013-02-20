@@ -18,7 +18,7 @@ from homepage.points import  PointsDetail
 @login_required()
 @course_permission()
 def index(request, course_short_title):
-	return render(request, 'main.html', 
+	return render(request, 'posts/main.html', 
 		{
 			'username':request.user.username,
 			'course_short_title':course_short_title,
@@ -31,7 +31,17 @@ def index(request, course_short_title):
 @login_required()
 @course_permission()
 def feed(request, course_short_title):
-	return render(request, 'feed.html',
+	return render(request, 'posts/feed.html',
+		{
+			'username':request.user.username,
+			'course_short_title':course_short_title
+		}
+	)
+	
+@login_required()
+@course_permission()
+def feed_include(request, course_short_title):
+	return render(request, 'posts/feed_include.html',
 		{
 			'username':request.user.username,
 			'course_short_title':course_short_title
@@ -39,7 +49,7 @@ def feed(request, course_short_title):
 	)
 	
 def rightbar(request, course_short_title):
-	return render(request, 'rightbar.html')
+	return render(request, 'posts/rightbar.html')
 	
 def header(request, course_short_title):
-	return render(request, 'header.html')
+	return render(request, 'posts/header.html')

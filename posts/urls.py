@@ -15,9 +15,10 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 	url(r'^$', 'posts.views.index'),
-	url(r'^templates/feed.html/$', 'posts.views.feed', name='feed_url'),
-	url(r'^templates/rightbar.html/$', 'posts.views.rightbar', name='rightbar_url'),
-	url(r'^templates/header.html/$', 'posts.views.header', name='header_url'),
+	url(r'^templates/posts/feed.html/$', 'posts.views.feed', name='feed_url'),
+	url(r'^templates/posts/feed_include.html/$', 'posts.views.feed_include', name='feed_include_url'),
+	url(r'^templates/posts/rightbar.html/$', 'posts.views.rightbar', name='rightbar_url'),
+	url(r'^templates/posts/header.html/$', 'posts.views.header', name='header_url'),
 	#url(r'^api/', include(api.urls)),
 	url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 	url(r'^admin/', include(admin.site.urls)),

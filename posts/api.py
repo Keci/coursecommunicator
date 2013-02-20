@@ -4,12 +4,15 @@ from tastypie.authentication import BasicAuthentication
 from tastypie import resources
 from tastypie.resources import ModelResource
 from tastypie.serializers import Serializer
+from django.contrib.contenttypes.models import ContentType
 from tastypie import fields
+from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from posts.models import Post, Tag, PostTag, PostVote
 from django.contrib.auth.models import User
 from customuser.models import CustomUser
 from course.models import Course
+from challenge.models import MainChallenge
 import urllib, hashlib
 
 def format_datetime(self):
@@ -35,11 +38,10 @@ def format_datetime(self):
 	else:
 		return '{}h ago'.format(s/3600)
 
-#class AvatarResource(ModelResource):
-#	class Meta:
-#		queryset = Avatar.objects.all();
-#		resource_name = 'avatar'
-#		excludes = ['id']
+class MainChallengeObjResource(ModelResource):
+	class Meta:
+		queryset = MainChallenge.objects.all()
+		resource_name = 'mainchallenge'
 
 class CommAuthentication(BasicAuthentication):
     def __init__(self, *args, **kwargs):
@@ -82,7 +84,19 @@ class PostResource(ModelResource):
 		always_return_data = True
 		
 	def obj_create(self, bundle, request, **kwargs):
-		return super(PostResource, self).obj_create(bundle, request, username=CustomUser.objects.get(user_ptr_id=request.user))
+		try:
+			return super(PostResource, self).obj_create(
+				bundle, 
+				request, 
+				username=CustomUser.objects.get(user_ptr_id=request.user), 
+				content_type=ContentType.objects.get(model=bundle.data['content_type'])
+			)
+		except ContentType.DoesNotExist:
+			return super(PostResource, self).obj_create(
+				bundle, 
+				request, 
+				username=CustomUser.objects.get(user_ptr_id=request.user), 
+			)
 		
 class PostTagResource(ModelResource):
 	post = fields.ForeignKey(PostResource, 'post')
@@ -93,26 +107,7 @@ class PostTagResource(ModelResource):
 		resource_name = 'posttag'
 		authentication = CommAuthentication()
 		authorization = Authorization()
-		
-class FeedResource(ModelResource):
-	user = fields.ForeignKey(UserResource, 'username', full=True)
-	replies = fields.ToManyField('self', attribute=lambda bundle: Post.objects.filter(parentpost=bundle.obj), null=True, full=True)
-	tags = fields.ToManyField(PostTagResource, attribute=lambda bundle: PostTag.objects.filter(post_id=bundle.obj), null=True, full=True)
-	course = fields.ForeignKey(CourseResource, 'course', full=True)
-	
-	class Meta:
-		queryset = Post.objects.filter(parentpost__isnull=True).order_by('-pubdate')
-		resource_name = 'feed'
-		authentication = CommAuthentication()
-		authorization = ReadOnlyAuthorization()
-		excludes = ['parentpost']
-		filtering = {
-			'course': ('exact')
-		}
-		
-	#def get_object_list(self, request):
-	#	return super(FeedResource, self).get_object_list(request).filter(course_id=Course.objects.get(short_title=course_short_title))
-		
+
 class PostVoteResource(ModelResource):
 	post_id = fields.ForeignKey(PostResource, 'post')
 	username_id = fields.ForeignKey(UserResource, 'username', full=True)
@@ -129,3 +124,47 @@ class PostVoteResource(ModelResource):
 		
 	def obj_create(self, bundle, request, **kwargs):
 		return super(PostVoteResource, self).obj_create(bundle, request, username=CustomUser.objects.get(user_ptr_id=request.user))
+		
+class FeedResource(ModelResource):
+	user = fields.ForeignKey(UserResource, 'username', full=True)
+	replies = fields.ToManyField('self', attribute=lambda bundle: Post.objects.filter(parentpost=bundle.obj), null=True, full=True)
+	tags = fields.ToManyField(PostTagResource, attribute=lambda bundle: PostTag.objects.filter(post_id=bundle.obj), null=True, full=True)
+	course = fields.ForeignKey(CourseResource, 'course', full=True)
+	content_object = GenericForeignKeyField({
+        MainChallenge: MainChallengeObjResource
+    }, 'content_object', null=True, full=True)
+	
+	class Meta:
+		queryset = Post.objects.filter(parentpost__isnull=True).order_by('-pubdate')
+		resource_name = 'feed'
+		authentication = CommAuthentication()
+		authorization = ReadOnlyAuthorization()
+		excludes = ['parentpost']
+		filtering = {
+			'course': ('exact'),
+		}
+		
+	def get_object_list(self, request):
+		return super(FeedResource, self).get_object_list(request).filter(content_type__isnull=True)
+
+class ChallengeResource(ModelResource):
+	user = fields.ForeignKey(UserResource, 'username', full=True)
+	replies = fields.ToManyField('self', attribute=lambda bundle: Post.objects.filter(parentpost=bundle.obj), null=True, full=True)
+	course = fields.ForeignKey(CourseResource, 'course', full=True)
+	content_object = GenericForeignKeyField({
+        MainChallenge: MainChallengeObjResource
+    }, 'content_object', null=True, full=True)
+	
+	class Meta:
+		queryset = Post.objects.filter(parentpost__isnull=True).order_by('-pubdate')
+		resource_name = 'mainchallengefeed'
+		authentication = CommAuthentication()
+		authorization = ReadOnlyAuthorization()
+		excludes = ['parentpost']
+		filtering = {
+			'course': ('exact'),
+			'object_id': ('exact'),
+		}
+		
+	def get_object_list(self, request):
+		return super(ChallengeResource, self).get_object_list(request).filter(content_type=ContentType.objects.get(model='mainchallenge').id)

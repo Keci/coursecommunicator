@@ -39,7 +39,6 @@ var CourseCommunicator = angular.module("CourseCommunicator", ['ui.directives', 
 );
 
 CourseCommunicator.factory("Constants", function(DjangoConstants) {
-  // pull in the django constants
   var constants = {};
   angular.extend(constants, DjangoConstants);
  
@@ -47,8 +46,6 @@ CourseCommunicator.factory("Constants", function(DjangoConstants) {
     get: function(key) {
       return constants[key];
     },
-    // this is a handy way to make all constants available in your HTML 
-    // e.g. $scope.c = Constants.all() 
     all: function() {
       return constants;
     }
@@ -62,28 +59,40 @@ CourseCommunicator.filter('textfilter', function(){
 });
 
 CourseCommunicator.config(['$routeProvider', function($routeProvider) {
+	var course_short_name = window.location.pathname.replace(/^\/([^\/]*).*$/, '$1');
 	$routeProvider
 		.when('/:order', {
-			templateUrl: 'templates/feed.html',
+			templateUrl: '/' + course_short_name + '/feed/templates/posts/feed.html',
 			controller: FilterCtrl
 		})
 		.when('/:order/filter/:filter', {
-			templateUrl: 'templates/feed.html',
+			templateUrl: '/' + course_short_name + '/feed/templates/posts/feed.html',
 			controller: FilterCtrl
+		})
+		.when('/:order/content/:contenttype/:contentobj', {
+			templateUrl: '/' + course_short_name + '/feed/templates/posts/feed_include.html',
+			controller: FeedCtrl
 		})
 		.otherwise({
 			redirectTo: '/new'
 		});
 }]);
 
-CourseCommunicator.factory('feed', ['$resource', function($resource) {
+/*CourseCommunicator.factory('feed', ['$resource', function($resource) {
   $resource('/api/posts/feed/?format=json');
-}]);
+}]);*/
 
 // Feed Controller
-var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams, Constants) {
+var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $location, $routeParams, Constants) {
 	$scope.c = Constants.all();
 	$scope.orderlink = $(".nav-tabs li.active").attr("id");
+	
+	$scope.contenttype = $routeParams.contenttype;
+	$scope.contentobj = $routeParams.contentobj;
+	
+	if($scope.contenttype == "mainchallenge") {
+		//$("div[challenge_id=" + $scope.contentobj + "]").trigger("click");
+	}
 
 	// Feed Resource
 	var feedResource = $resource('/api/posts/:url',{
@@ -131,15 +140,55 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams, C
 	
 	// Get Feed by default (and update every 120s)
 	function poll() {
-		feedResource.get({url: 'feed/', format: 'json', course: $scope.c.course_id}, function(data) {
-			$scope.feed = data.objects;
-		});
+		if(typeof $scope.contenttype === 'undefined') {
+			if(typeof $scope.c.path_name === 'undefined') {
+				$scope.loading=true;
+				feedResource.get(
+					{
+						url: 'feed/', 
+						format: 'json', 
+						course: $scope.c.course_id
+					}, function(data) {
+						$scope.feed = data.objects;
+						$scope.loading=false;
+					}
+				);
+			} else {
+				$(".comments").hide();
+				return;
+			}
+		} else {
+			$(".comments").show();
+			$scope.loading=true;
+			feedResource.get(
+				{
+					url: $scope.contenttype + 'feed/', 
+					format: 'json', 
+					course: $scope.c.course_id, 
+					object_id: $scope.contentobj
+				}, function(data) {
+					$scope.feed = data.objects;
+					$scope.loading=false;
+				}
+			);
+		}
 		$timeout(poll, 120000);
 	};
 	poll();
 
 	// Submit new post
 	$scope.submit = function(mode, parentpost) {
+		var contenttype = null;
+		var contentobj = null;
+		
+		// Determine contenttype and contentobj
+		var location = $location.path().split("content/");
+		if(typeof location[1] != 'undefined') {
+			location = location[1].split("/");
+			contenttype = location[0];
+			contentobj = location[1];
+		}
+		
 		var text = "";
 		if(mode == "newPost") {
 			text = $scope.newpost.text;
@@ -148,6 +197,11 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams, C
 			text = $scope.newpost.replytext;
 			parentpost = "/api/posts/post/" + parentpost + "/";
 		}
+		// If content type is available (i.e. not standard feed)
+		if(typeof $scope.contenttype != 'undefined') {
+			content_type = $scope.contenttype;
+			object_id = $scope.contentobj;
+		}
 		var data = ({
 			"parentpost_id": parentpost,
 			//"username_id": "/api/posts/user/1/",
@@ -155,30 +209,41 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams, C
 			"pubdate": new Date(),
 			"text": text,
 			"votes": 0,
-			"goodpost": 0
+			"goodpost": 0,
+			"content_type": contenttype,
+			"object_id": contentobj
 		});
 		// Post speichern
 		feedResource.save({url: 'post/'}, data, function(datatmp) {
 			// Post und Tags speichern (newPost)
+			// only for standard feed
 			if(mode == "newPost") {
-				var tagstmp = $scope.newpost.tags.split(",");
-				for(var t in tagstmp) {
-					posttagResource.save({url: '/'}, {
-						"tag": "/api/posts/posttag/" + tagstmp[t] + "/",
-						"post": "/api/posts/post/" + datatmp.id + "/"
-					}, function() {
-						$timeout(function()
-						{
-							$scope.feed = data.objects;
-							resetForm("newPost");
-							poll();
-						}, 1000);
-					});
+				if(typeof $scope.newpost.tags != 'undefined') {
+					var tagstmp = $scope.newpost.tags.split(",");
+					for(var t in tagstmp) {
+						posttagResource.save({url: '/'}, {
+							"tag": "/api/posts/posttag/" + tagstmp[t] + "/",
+							"post": "/api/posts/post/" + datatmp.id + "/"
+						}, function() {
+							$timeout(function()
+							{
+								resetForm("newPost");
+								poll();
+							}, 1000);
+						});
+					}
+				} else {
+					$timeout(function()
+					{
+						resetForm("newPost");
+						poll();
+					}, 1000);
 				}
 			// Nur Post speichern (newReply)
 			} else if (mode == "newReply") {
 				$timeout(function()
 				{
+					resetForm("newPost");
 					poll();
 				}, 1000);
 			}
@@ -186,6 +251,7 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams, C
 	};
 	
 	$scope.vote = function(mode, postid) {
+		$scope.loading=true;
 		var votes = null;
 		feedResource.get({url: 'post/' + postid + '/', format: 'json'}, function(data) {
 			if(mode == "up") {
@@ -211,7 +277,7 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams, C
 						}, function(data) {
 							$timeout(function()
 							{
-								$scope.feed = data.objects;
+								//$scope.feed = data.objects;
 								poll();
 							}, 1000);
 						});
@@ -219,6 +285,7 @@ var FeedCtrl = function($scope, $rootScope, $resource, $timeout, $routeParams, C
 				}
 			});
 		});
+		$scope.loading=false;
 	};
 	
 	$scope.editPost = function(post, $event) {
